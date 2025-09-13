@@ -1,12 +1,10 @@
 # MyPickPal
 
-# MyPickPal
-
 🛍️ AI Shopping – Your Unbiased Product Research Assistant
 
 🚀 Overview
 
-Tired of opening 20 browser tabs just to buy one pair of earbuds? AI Shopping helps you find the best products in minutes, not hours.
+Tired of opening 20 browser tabs just to buy one pair of earbuds? AI Shopping helps you find the best products in seconds, not hours.
 
 Our tool scrapes reviews and discussions (Amazon, Reddit, blogs) and applies AI sentiment analysis + summarization to generate:
 	•	✅ The top 3 products for your query
