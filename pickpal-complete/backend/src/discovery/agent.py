@@ -12,6 +12,7 @@ from ..common.utils import logger, log_context
 from ..common.aspects import detect_product_category
 from .helpers import deduplicate_candidates, gather_evidence_and_filter, expand_search_queries
 from .adapters import AmazonAdapter, RedditAdapter, ReviewBlogAdapter
+from .gemini_adapter import GeminiAdapter
 
 class DiscoveryAgent(AgentBase):
     """Agent responsible for discovering product candidates from various sources."""
@@ -25,13 +26,15 @@ class DiscoveryAgent(AgentBase):
         self.amazon_adapter = None
         self.reddit_adapter = None
         self.review_blog_adapter = None
+        self.gemini_adapter = None
         
         # Source priority configuration
         self.sources = {
-            "amazon": {"priority": 1, "enabled": True, "timeout": 10},
-            "reddit": {"priority": 2, "enabled": True, "timeout": 8},
-            "review_blogs": {"priority": 3, "enabled": True, "timeout": 12},
-            "mock_fallback": {"priority": 99, "enabled": True, "timeout": 1}
+            "mock_fallback": {"priority": 1, "enabled": True, "timeout": 1},
+            "gemini_ai": {"priority": 2, "enabled": True, "timeout": 15},
+            "amazon": {"priority": 3, "enabled": True, "timeout": 10},
+            "reddit": {"priority": 4, "enabled": True, "timeout": 8},
+            "review_blogs": {"priority": 5, "enabled": True, "timeout": 12}
         }
         
         # Category-specific synonyms and search terms
@@ -266,16 +269,20 @@ class DiscoveryAgent(AgentBase):
             amazon_api_key = os.getenv('AMAZON_API_KEY')
             reddit_client_id = os.getenv('REDDIT_CLIENT_ID')
             reddit_client_secret = os.getenv('REDDIT_CLIENT_SECRET')
+            gemini_api_key = os.getenv('GEMINI_API_KEY', 'AIzaSyD1QGcEvohkBuLR6VW7G0fl1qTS8D2NMlM')
             
             self.amazon_adapter = AmazonAdapter(self.session, amazon_api_key)
             self.reddit_adapter = RedditAdapter(self.session, reddit_client_id, reddit_client_secret)
             self.review_blog_adapter = ReviewBlogAdapter(self.session)
+            self.gemini_adapter = GeminiAdapter(gemini_api_key)
     
     async def _fetch_from_source(self, source_name: str, queries: List[str], category: str, 
                                brief: ShoppingBrief, trace: Trace) -> List[Dict]:
         """Fetch candidates from a specific source using real adapters."""
         try:
-            if source_name == "amazon" and self.amazon_adapter:
+            if source_name == "gemini_ai" and self.gemini_adapter:
+                return await self.gemini_adapter.search_products(queries, category, max_results=3)
+            elif source_name == "amazon" and self.amazon_adapter:
                 return await self.amazon_adapter.search_products(queries, category, max_results=20)
             elif source_name == "reddit" and self.reddit_adapter:
                 return await self.reddit_adapter.search_products(queries, category, max_results=15)
@@ -317,7 +324,8 @@ class DiscoveryAgent(AgentBase):
                 "source": "mock_fallback",
                 "last_updated": datetime.now().isoformat(),
                 "evidence_score": 3,  # Good evidence score for mock data
-                "evidence_notes": ["Mock data with comprehensive reviews"]
+                "evidence_notes": ["Mock data with comprehensive reviews"],
+                "image_url": product.get("image_url", "")
             }
             mock_candidates.append(candidate)
         
@@ -419,13 +427,10 @@ class DiscoveryAgent(AgentBase):
             else:
                 # Convert to ProductCandidate
                 product_candidate = ProductCandidate(
-                    trace=Trace(request_id=getattr(self, '_current_request_id', 'unknown'), 
-                               step="filter", source_agent="discovery"),
                     name=candidate.get("name", "Unknown Product"),
                     price=candidate.get("price", 0.0),
                     stars=candidate.get("stars", 0.0),
-                    category=candidate.get("category", "general"),
-                    urls={"primary": candidate.get("url", "")},
+                    url=candidate.get("url", ""),
                     raw_reviews=candidate.get("reviews", []),
                     meta={
                         "source": candidate.get("source", "unknown"),
@@ -435,7 +440,10 @@ class DiscoveryAgent(AgentBase):
                         "mentions": candidate.get("mentions", 0),
                         "evidence_score": candidate.get("evidence_score", 0),
                         "evidence_notes": candidate.get("evidence_notes", [])
-                    }
+                    },
+                    trace=Trace(request_id=getattr(self, '_current_request_id', 'unknown'), 
+                               step="filter", source_agent="discovery"),
+                    image_url=candidate.get("image_url", "")
                 )
                 filtered.append(product_candidate)
         

@@ -15,6 +15,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'src'))
 
 from src.planner.agent import PlannerAgent
 from src.common.utils import logger, generate_request_id
+from src.discovery.simple_gemini import SimpleGeminiSearch
 
 app = FastAPI(title="AI Shopping API", description="AI-powered product recommendation system with agent architecture")
 
@@ -29,8 +30,9 @@ app.add_middleware(
 
 DATABASE_PATH = "search_history.db"
 
-# Initialize the planner agent
+# Initialize the planner agent and simple Gemini search
 planner = PlannerAgent()
+simple_gemini = SimpleGeminiSearch(os.getenv('GEMINI_API_KEY', 'AIzaSyD1QGcEvohkBuLR6VW7G0fl1qTS8D2NMlM'))
 
 async def init_db():
     async with aiosqlite.connect(DATABASE_PATH) as db:
@@ -58,6 +60,7 @@ class SearchQuery(BaseModel):
     query: str
     max_price: Optional[float] = None
     min_rating: Optional[float] = None
+    use_agent_pipeline: Optional[bool] = False  # True for hardcoded options, False for search
 
 class SearchHistoryItem(BaseModel):
     id: str
@@ -185,11 +188,11 @@ async def search_products_stream(query: SearchQuery):
 
 @app.post("/search", response_model=SearchResponse)
 async def search_products(query: SearchQuery):
-    """Search for products using the new agent-based architecture."""
+    """Search for products - uses Gemini directly for search, agent pipeline for hardcoded options."""
     try:
         request_id = generate_request_id()
         logger.info(f"[{request_id}] Received search request: {query.query}")
-        logger.info(f"[{request_id}] Max price: {query.max_price}, Min rating: {query.min_rating}")
+        logger.info(f"[{request_id}] Use agent pipeline: {query.use_agent_pipeline}")
         
         # Build constraints from query parameters
         constraints = {}
@@ -198,45 +201,76 @@ async def search_products(query: SearchQuery):
         if query.min_rating:
             constraints["min_rating"] = query.min_rating
         
-        logger.info(f"[{request_id}] Starting agent pipeline with constraints: {constraints}")
-        
-        # Use the planner agent to handle the entire pipeline
-        result = await planner.handle_user_goal(
-            query=query.query,
-            constraints=constraints,
-            request_id=request_id
-        )
-        
-        logger.info(f"[{request_id}] Agent pipeline completed. Success: {result['success']}")
-        
-        if not result["success"]:
+        if query.use_agent_pipeline:
+            # Hardcoded option clicked - use full agent pipeline
+            logger.info(f"[{request_id}] Using full agent pipeline for hardcoded option")
+            
+            result = await planner.handle_user_goal(
+                query=query.query,
+                constraints=constraints,
+                request_id=request_id
+            )
+            
+            if not result["success"]:
+                return SearchResponse(
+                    query=query.query,
+                    recommendations=[],
+                    total_found=0
+                )
+            
+            # Convert agent results to API format
+            recommendations = []
+            for rec in result["recommendations"]:
+                recommendation = ProductRecommendation(
+                    name=rec["name"],
+                    price=rec["price"],
+                    rating=rec["rating"],
+                    overall_score=rec["overall_score"],
+                    pros=rec["pros"],
+                    cons=rec["cons"],
+                    summary=rec["summary"],
+                    review_count=rec["review_count"],
+                    image_url=rec.get("image_url")
+                )
+                recommendations.append(recommendation)
+            
             return SearchResponse(
                 query=query.query,
-                recommendations=[],
-                total_found=0
+                recommendations=recommendations,
+                total_found=result["total_found"]
             )
         
-        # Convert agent results to API format
-        recommendations = []
-        for rec in result["recommendations"]:
-            recommendation = ProductRecommendation(
-                name=rec["name"],
-                price=rec["price"],
-                rating=rec["rating"],
-                overall_score=rec["overall_score"],
-                pros=rec["pros"],
-                cons=rec["cons"],
-                summary=rec["summary"],
-                review_count=rec["review_count"],
-                image_url=rec.get("image_url")
+        else:
+            # Search function - use Gemini directly
+            logger.info(f"[{request_id}] Using simple Gemini search")
+            
+            gemini_results = await simple_gemini.search_simple(
+                query=query.query,
+                max_price=query.max_price,
+                min_rating=query.min_rating
             )
-            recommendations.append(recommendation)
-        
-        return SearchResponse(
-            query=query.query,
-            recommendations=recommendations,
-            total_found=result["total_found"]
-        )
+            
+            # Convert Gemini results to API format
+            recommendations = []
+            for product in gemini_results:
+                recommendation = ProductRecommendation(
+                    name=product["name"],
+                    price=product["price"],
+                    rating=product["rating"],
+                    overall_score=product["overall_score"],
+                    pros=product["pros"],
+                    cons=product["cons"],
+                    summary=product["summary"],
+                    review_count=product["review_count"],
+                    image_url=product.get("image_url")
+                )
+                recommendations.append(recommendation)
+            
+            return SearchResponse(
+                query=query.query,
+                recommendations=recommendations,
+                total_found=len(recommendations)
+            )
         
     except Exception as e:
         logger.error(f"Search failed: {e}")

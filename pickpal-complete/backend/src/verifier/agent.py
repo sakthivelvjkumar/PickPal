@@ -115,9 +115,10 @@ class VerifierAgent(AgentBase):
         seen_ids = set()
         
         for product in products:
-            if product.canonical_id in seen_ids:
+            product_id = getattr(product, 'canonical_id', product.name)
+            if product_id in seen_ids:
                 return False
-            seen_ids.add(product.canonical_id)
+            seen_ids.add(product_id)
         
         return True
     

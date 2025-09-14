@@ -160,11 +160,18 @@ function App() {
     setAgentMessage('')
     
     try {
-      const searchData = { query: query.trim() }
+      // Check if this is a hardcoded suggestion (use full agent pipeline) or search query (use agent pipeline + Gemini results)
+      const isHardcodedOption = suggestions.includes(query.trim())
+      
+      const searchData = { 
+        query: query.trim(),
+        use_agent_pipeline: true  // Always use agent pipeline for animations
+      }
       console.log('🚀 Starting streaming search request:', searchData)
       console.log('🔗 API URL:', `${API_BASE_URL}/search/stream`)
 
-      const response = await fetch(`${API_BASE_URL}/search/stream`, {
+      // Start both requests in parallel for non-hardcoded options
+      const streamPromise = fetch(`${API_BASE_URL}/search/stream`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -172,6 +179,22 @@ function App() {
         body: JSON.stringify(searchData),
       })
 
+      let geminiPromise = null
+      if (!isHardcodedOption) {
+        // Get Gemini results in parallel for search queries
+        geminiPromise = fetch(`${API_BASE_URL}/search`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            query: query.trim(),
+            use_agent_pipeline: false
+          }),
+        })
+      }
+
+      const response = await streamPromise
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
       }
@@ -183,6 +206,7 @@ function App() {
 
       const decoder = new TextDecoder()
       let buffer = ''
+      let agentResults = null
 
       while (true) {
         const { done, value } = await reader.read()
@@ -202,9 +226,8 @@ function App() {
                 setAgentMessage(data.message)
                 console.log(`🤖 Agent Update: ${data.agent} - ${data.message}`)
               } else if (data.type === 'results') {
-                console.log('✅ Search completed:', data.data)
-                setResults(data.data)
-                addToHistory(query.trim(), data.data.recommendations.length)
+                console.log('✅ Agent pipeline completed:', data.data)
+                agentResults = data.data
               } else if (data.type === 'error') {
                 console.error('❌ Search error:', data.message)
                 setError(data.message)
@@ -214,6 +237,27 @@ function App() {
             }
           }
         }
+      }
+
+      // Determine final results to display
+      let finalResults = agentResults
+      
+      if (!isHardcodedOption && geminiPromise) {
+        try {
+          const geminiResponse = await geminiPromise
+          if (geminiResponse.ok) {
+            const geminiData = await geminiResponse.json()
+            console.log('✅ Using Gemini results for search query:', geminiData)
+            finalResults = geminiData
+          }
+        } catch (geminiError) {
+          console.warn('Failed to get Gemini results, using agent results:', geminiError)
+        }
+      }
+
+      if (finalResults) {
+        setResults(finalResults)
+        addToHistory(query.trim(), finalResults.recommendations.length)
       }
     } catch (err) {
       console.error('❌ Search error:', err)

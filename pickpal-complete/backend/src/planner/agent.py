@@ -206,7 +206,7 @@ class PlannerAgent(AgentBase):
                 "cons": product.cons,
                 "summary": f"Scored {product.score:.1f}/10 based on comprehensive analysis",
                 "review_count": len(getattr(product, 'raw_reviews', [])),
-                "image_url": self._get_product_image_url(product.name),
+                "image_url": product.image_url or self._get_product_image_url(product.name),
                 "why": product.why
             }
             recommendations.append(card)

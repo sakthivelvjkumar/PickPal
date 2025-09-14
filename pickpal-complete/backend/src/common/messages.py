@@ -1,5 +1,6 @@
 from pydantic import BaseModel, Field
 from typing import List, Dict, Optional
+from dataclasses import dataclass, field
 import time
 
 class Trace(BaseModel):
@@ -17,40 +18,53 @@ class ShoppingBrief(BaseModel):
     weights: Dict[str, float] = {}
     success: Dict[str, int | bool] = {"k": 3, "diversity": True, "min_reviews": 50}
 
-class ProductCandidate(BaseModel):
-    trace: Trace
+@dataclass
+class ProductCandidate:
+    """A product candidate discovered from various sources."""
     name: str
     price: Optional[float] = None
     stars: Optional[float] = None
-    category: Optional[str] = None
-    urls: Dict[str, str] = {}
-    raw_reviews: List[Dict] = []  # {text, stars, date, helpful, verified}
-    meta: Dict[str, float | int | str | List[str]] = {}
+    url: Optional[str] = None
+    raw_reviews: List[Dict] = field(default_factory=list)
+    meta: Dict = field(default_factory=dict)  # Source-specific metadata
+    trace: Optional[Trace] = None
+    image_url: Optional[str] = None
 
-class EnrichedProduct(BaseModel):
-    trace: Trace
-    canonical_id: str
+@dataclass
+class EnrichedProduct:
+    """A product with enriched data and quality signals."""
     name: str
-    price: Optional[float] = None
-    stars: Optional[float] = None
-    reviews_total: Optional[int] = None
-    signals: Dict[str, float] = {}  # verified_pct, avg_helpful, recency_days_p50
-    aspect_frequencies: Dict[str, float] = {}  # aspect frequency (for weighting)
-    raw_reviews: List[Dict] = []  # Keep original reviews for pros/cons extraction
+    price: float
+    stars: float
+    url: str
+    raw_reviews: List[Dict]
+    aspects: Dict[str, float]  # Aspect scores (e.g., {"sound_quality": 4.2, "battery": 3.8})
+    quality_signals: Dict[str, float]  # Quality indicators
+    meta: Dict = field(default_factory=dict)
+    trace: Optional['Trace'] = None
+    image_url: Optional[str] = None
 
-class RankedProduct(BaseModel):
-    trace: Trace
-    canonical_id: str
+@dataclass
+class RankedProduct:
+    """A product with ranking score and extracted insights."""
     name: str
-    score: float
-    pros: List[str]
-    cons: List[str]
-    why: Dict[str, float]  # rating/sentiment/recency/helpfulness weights
-    price: Optional[float] = None
-    stars: Optional[float] = None
+    price: float
+    stars: float
+    url: str
+    raw_reviews: List[Dict]
+    aspects: Dict[str, float]
+    quality_signals: Dict[str, float]
+    score: float  # Composite ranking score
+    pros: List[str]  # Extracted pros
+    cons: List[str]  # Extracted cons
+    why: Dict[str, float]  # Explanation of ranking
+    meta: Dict = field(default_factory=dict)
+    trace: Optional['Trace'] = None
+    image_url: Optional[str] = None
 
-class RankedList(BaseModel):
-    trace: Trace
+@dataclass
+class RankedList:
+    trace: 'Trace'
     items: List[RankedProduct]
 
 class ClarificationRequest(BaseModel):

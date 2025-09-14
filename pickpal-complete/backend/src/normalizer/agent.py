@@ -35,8 +35,8 @@ class NormalizerAgent(AgentBase):
         with log_context(trace.request_id):
             logger.info(f"Normalization complete: {len(enriched_products)} enriched products")
             for product in enriched_products:
-                signals_summary = {k: f"{v:.2f}" if isinstance(v, float) else v for k, v in product.signals.items()}
-                logger.info(f"  - {product.name}: {len(product.aspect_frequencies)} aspects, signals: {signals_summary}")
+                signals_summary = {k: f"{v:.2f}" if isinstance(v, float) else v for k, v in product.quality_signals.items()}
+                logger.info(f"  - {product.name}: {len(product.aspects)} aspects, signals: {signals_summary}")
         
         return enriched_products
     
@@ -73,24 +73,26 @@ class NormalizerAgent(AgentBase):
         signals = self._calculate_signals(reviews)
         
         # Calculate aspect frequencies
-        category = candidate.category or "general"
+        category = candidate.meta.get("category", "general")
         aspect_counts = calculate_aspect_frequency(reviews, category)
         
         # Convert counts to frequencies (normalize by total reviews)
         total_reviews = len(reviews) if reviews else 1
         aspects = {aspect: count / total_reviews for aspect, count in aspect_counts.items()}
         
-        return EnrichedProduct(
-            trace=trace,
-            canonical_id=self._generate_canonical_id(candidate.name),
+        enriched = EnrichedProduct(
             name=candidate.name,
-            price=candidate.price,
-            stars=candidate.stars,
-            reviews_total=len(reviews),
-            signals=signals,
-            aspect_frequencies=aspects,
-            raw_reviews=reviews
+            price=candidate.price or 0.0,
+            stars=candidate.stars or 0.0,
+            url=candidate.url or "",
+            raw_reviews=candidate.raw_reviews,
+            aspects=aspects,
+            quality_signals=signals,
+            meta=candidate.meta,
+            trace=trace,
+            image_url=candidate.image_url
         )
+        return enriched
     
     def _generate_canonical_id(self, product_name: str) -> str:
         """Generate a canonical ID for the product."""

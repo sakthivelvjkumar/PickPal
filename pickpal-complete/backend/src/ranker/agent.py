@@ -35,8 +35,8 @@ class RankerAgent(AgentBase):
         for product in enriched:
             # Calculate composite score
             rating = product.stars or 0
-            recency_days = product.signals.get("recency_days_p50", 365)
-            helpfulness = product.signals.get("avg_helpful", 0)
+            recency_days = product.quality_signals.get("recency_days_p50", 365)
+            helpfulness = product.quality_signals.get("avg_helpful", 0)
             
             # Calculate overall sentiment from reviews
             sentiment = self._calculate_product_sentiment(product)
@@ -86,15 +86,20 @@ class RankerAgent(AgentBase):
             }
             
             ranked_product = RankedProduct(
-                trace=trace,
-                canonical_id=product.canonical_id,
                 name=product.name,
+                price=product.price,
+                stars=product.stars,
+                url=product.url,
+                raw_reviews=product.raw_reviews,
+                aspects=product.aspects,
+                quality_signals=product.quality_signals,
                 score=score,
                 pros=pros,
                 cons=cons,
                 why=why,
-                price=product.price,
-                stars=product.stars
+                meta=product.meta,
+                trace=trace,
+                image_url=product.image_url
             )
             
             ranked_products.append(ranked_product)
@@ -120,9 +125,7 @@ class RankerAgent(AgentBase):
         
         return RankedList(
             trace=trace,
-            items=ranked_products[:topk],
-            total_scored=len(ranked_products),
-            weights_used=weights
+            items=ranked_products[:topk]
         )
     
     def _extract_key_positives(self, positive_reviews: List[Dict]) -> List[str]:
@@ -176,7 +179,7 @@ class RankerAgent(AgentBase):
         # we'll estimate from signals and rating
         
         rating = product.stars or 0
-        rating_variance = product.signals.get("rating_variance", 0)
+        rating_variance = product.quality_signals.get("rating_variance", 0)
         
         # Convert rating to sentiment scale (-1 to 1)
         base_sentiment = (rating - 3) / 2  # 5-star -> 1, 3-star -> 0, 1-star -> -1
