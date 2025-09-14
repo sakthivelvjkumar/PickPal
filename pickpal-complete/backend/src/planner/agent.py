@@ -97,12 +97,10 @@ class PlannerAgent(AgentBase):
             "recency": 0.2,
             "helpfulness": 0.1
         }
-        
-        # Success criteria
         success = {
-            "k": 3,
+            "k": 5,
             "diversity": True,
-            "min_reviews": 5  # Lowered for demo data
+            "min_reviews": 3  # Lowered for demo data
         }
         
         return ShoppingBrief(
@@ -175,11 +173,30 @@ class PlannerAgent(AgentBase):
         
         return None
     
+    def _get_product_image_url(self, product_name: str) -> str:
+        """Get product-specific image URL based on product name."""
+        name_lower = product_name.lower()
+        
+        # Map products to specific Unsplash images
+        if "sony" in name_lower and "wf-1000xm4" in name_lower:
+            return "https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=300&h=300&fit=crop"
+        elif "airpods" in name_lower:
+            return "https://images.unsplash.com/photo-1600294037681-c80b4cb5b434?w=300&h=300&fit=crop"
+        elif "bose" in name_lower:
+            return "https://images.unsplash.com/photo-1484704849700-f032a568e944?w=300&h=300&fit=crop"
+        elif "sennheiser" in name_lower:
+            return "https://images.unsplash.com/photo-1583394838336-acd977736f90?w=300&h=300&fit=crop"
+        elif "jabra" in name_lower:
+            return "https://images.unsplash.com/photo-1572536147248-ac59a8abfa4b?w=300&h=300&fit=crop"
+        else:
+            # Default earbuds image
+            return "https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=300&h=300&fit=crop"
+    
     def _to_product_cards(self, ranked_list: RankedList, request_id: str) -> Dict:
         """Convert ranked list to final product cards format."""
         recommendations = []
         
-        for product in ranked_list.items[:3]:  # Top 3
+        for product in ranked_list.items[:5]:  # Top 5
             card = {
                 "name": product.name,
                 "price": product.price or 0.0,
@@ -189,7 +206,7 @@ class PlannerAgent(AgentBase):
                 "cons": product.cons,
                 "summary": f"Scored {product.score:.1f}/10 based on comprehensive analysis",
                 "review_count": len(getattr(product, 'raw_reviews', [])),
-                "image_url": f"https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=300&h=300&fit=crop",
+                "image_url": self._get_product_image_url(product.name),
                 "why": product.why
             }
             recommendations.append(card)

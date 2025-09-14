@@ -36,6 +36,8 @@ function App() {
   const [error, setError] = useState('')
   const [searchHistory, setSearchHistory] = useState<SearchHistoryItem[]>([])
   const [showHistory, setShowHistory] = useState(false)
+  const [currentAgent, setCurrentAgent] = useState('')
+  const [agentMessage, setAgentMessage] = useState('')
 
   const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
 
@@ -45,9 +47,12 @@ function App() {
 
   const loadSearchHistory = async () => {
     try {
+      console.log('🔗 Loading search history from:', `${API_BASE_URL}/search-history`)
       const response = await fetch(`${API_BASE_URL}/search-history`)
+      console.log('📡 Search history response status:', response.status)
       if (response.ok) {
         const data = await response.json()
+        console.log('✅ Search history loaded:', data)
         setSearchHistory(data.map((item: any) => ({
           ...item,
           timestamp: new Date(item.timestamp)
@@ -150,11 +155,16 @@ function App() {
     
     setLoading(true)
     setError('')
+    setResults(null)
+    setCurrentAgent('')
+    setAgentMessage('')
     
     try {
       const searchData = { query: query.trim() }
+      console.log('🚀 Starting streaming search request:', searchData)
+      console.log('🔗 API URL:', `${API_BASE_URL}/search/stream`)
 
-      const response = await fetch(`${API_BASE_URL}/search`, {
+      const response = await fetch(`${API_BASE_URL}/search/stream`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -166,14 +176,52 @@ function App() {
         throw new Error(`HTTP error! status: ${response.status}`)
       }
 
-      const data: SearchResponse = await response.json()
-      setResults(data)
-      addToHistory(query.trim(), data.recommendations.length)
+      const reader = response.body?.getReader()
+      if (!reader) {
+        throw new Error('No response body reader available')
+      }
+
+      const decoder = new TextDecoder()
+      let buffer = ''
+
+      while (true) {
+        const { done, value } = await reader.read()
+        if (done) break
+
+        buffer += decoder.decode(value, { stream: true })
+        const lines = buffer.split('\n')
+        buffer = lines.pop() || ''
+
+        for (const line of lines) {
+          if (line.startsWith('data: ')) {
+            try {
+              const data = JSON.parse(line.slice(6))
+              
+              if (data.type === 'status') {
+                setCurrentAgent(data.agent)
+                setAgentMessage(data.message)
+                console.log(`🤖 Agent Update: ${data.agent} - ${data.message}`)
+              } else if (data.type === 'results') {
+                console.log('✅ Search completed:', data.data)
+                setResults(data.data)
+                addToHistory(query.trim(), data.data.recommendations.length)
+              } else if (data.type === 'error') {
+                console.error('❌ Search error:', data.message)
+                setError(data.message)
+              }
+            } catch (parseError) {
+              console.error('Failed to parse SSE data:', parseError)
+            }
+          }
+        }
+      }
     } catch (err) {
+      console.error('❌ Search error:', err)
       setError('Failed to search products. Please try again.')
-      console.error('Search error:', err)
     } finally {
       setLoading(false)
+      setCurrentAgent('')
+      setAgentMessage('')
     }
   }
 
@@ -296,11 +344,56 @@ function App() {
             {loading && (
               <div className="flex flex-col items-center justify-center h-full animate-in fade-in duration-500 ease-out">
                 <div className="relative mb-6">
-                  <div className="w-12 h-12 border-3 border-orange-100 border-t-orange-500 rounded-full animate-spin"></div>
-                  <div className="absolute inset-0 w-12 h-12 border-3 border-transparent border-r-orange-300 rounded-full animate-spin animation-delay-150"></div>
+                  <div className="w-16 h-16 border-4 border-orange-100 border-t-orange-500 rounded-full animate-spin"></div>
+                  <div className="absolute inset-0 w-16 h-16 border-4 border-transparent border-r-orange-300 rounded-full animate-spin animation-delay-150"></div>
                 </div>
-                <p className="text-gray-600 animate-pulse text-lg font-medium">Analyzing products with AI...</p>
-                <div className="flex space-x-1 mt-4">
+                
+                {/* Agent Status Display */}
+                {currentAgent && (
+                  <div className="text-center mb-6 animate-in slide-in-from-bottom duration-300">
+                    <div className="inline-flex items-center gap-3 bg-orange-50 px-6 py-3 rounded-full border border-orange-200 mb-3">
+                      <div className="w-3 h-3 bg-orange-500 rounded-full animate-pulse"></div>
+                      <span className="text-orange-800 font-medium capitalize text-lg">
+                        {currentAgent} Agent
+                      </span>
+                    </div>
+                    {agentMessage && (
+                      <p className="text-gray-600 text-base max-w-md mx-auto leading-relaxed">
+                        {agentMessage}
+                      </p>
+                    )}
+                  </div>
+                )}
+                
+                {!currentAgent && (
+                  <p className="text-gray-600 animate-pulse text-lg font-medium mb-6">
+                    Initializing AI agents...
+                  </p>
+                )}
+                
+                {/* Agent Pipeline Visualization */}
+                <div className="flex items-center gap-2 mb-6">
+                  {['planner', 'clarifier', 'discovery', 'normalizer', 'ranker', 'verifier'].map((agent, index) => (
+                    <div key={agent} className="flex items-center">
+                      <div className={`w-3 h-3 rounded-full transition-all duration-300 ${
+                        currentAgent === agent 
+                          ? 'bg-orange-500 animate-pulse scale-125' 
+                          : currentAgent && ['planner', 'clarifier', 'discovery', 'normalizer', 'ranker', 'verifier'].indexOf(currentAgent) > index
+                          ? 'bg-green-500'
+                          : 'bg-gray-200'
+                      }`}></div>
+                      {index < 5 && (
+                        <div className={`w-6 h-0.5 transition-all duration-300 ${
+                          currentAgent && ['planner', 'clarifier', 'discovery', 'normalizer', 'ranker', 'verifier'].indexOf(currentAgent) > index
+                            ? 'bg-green-500'
+                            : 'bg-gray-200'
+                        }`}></div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+                
+                <div className="flex space-x-1">
                   <div className="w-2 h-2 bg-orange-400 rounded-full animate-bounce"></div>
                   <div className="w-2 h-2 bg-orange-400 rounded-full animate-bounce animation-delay-100"></div>
                   <div className="w-2 h-2 bg-orange-400 rounded-full animate-bounce animation-delay-200"></div>

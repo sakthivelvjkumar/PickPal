@@ -274,17 +274,26 @@ class DiscoveryAgent(AgentBase):
         products_data = self.mock_data.get(category, [])
         mock_candidates = []
         
-        for product in products_data:
+        # Get the desired number of products (k from success criteria)
+        desired_count = brief.success.get('k', 3)
+        
+        for i, product in enumerate(products_data[:desired_count * 2]):  # Get more than needed for filtering
             candidate = {
                 "name": product.get("product", product.get("name", "Unknown Product")),
                 "price": product.get("price", 0.0),
                 "stars": product.get("stars", 0.0),
-                "url": f"https://mock-source.com/product/{product.get('id', 'unknown')}",
+                "url": f"https://mock-source.com/product/{i}",
                 "reviews": product.get("reviews", []),
+                "reviews_count": len(product.get("reviews", [])),
                 "source": "mock_fallback",
-                "last_updated": datetime.now().isoformat()
+                "last_updated": datetime.now().isoformat(),
+                "evidence_score": 3,  # Good evidence score for mock data
+                "evidence_notes": ["Mock data with comprehensive reviews"]
             }
             mock_candidates.append(candidate)
+        
+        with log_context(trace.request_id):
+            logger.info(f"Mock fallback returning {len(mock_candidates)} candidates")
         
         return mock_candidates
     

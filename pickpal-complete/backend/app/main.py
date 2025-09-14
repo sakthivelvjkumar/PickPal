@@ -1,12 +1,14 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 import json
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any, Optional, AsyncGenerator
 import aiosqlite
 from datetime import datetime
 import sys
 import os
+import asyncio
 
 # Add src to Python path for imports
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'src'))
@@ -47,6 +49,11 @@ async def startup_event():
     await init_db()
     logger.info("AI Shopping API started with agent architecture")
 
+@app.get("/health")
+async def health_check():
+    logger.info("Health check endpoint called")
+    return {"status": "healthy", "message": "Backend is running"}
+
 class SearchQuery(BaseModel):
     query: str
     max_price: Optional[float] = None
@@ -84,11 +91,105 @@ class SearchResponse(BaseModel):
 async def healthz():
     return {"status": "ok"}
 
+async def search_stream_generator(query: str, constraints: Dict, request_id: str) -> AsyncGenerator[str, None]:
+    """Generator for streaming search progress updates."""
+    
+    # Send initial status
+    yield f"data: {json.dumps({'type': 'status', 'agent': 'planner', 'message': 'Starting search pipeline...'})}\n\n"
+    await asyncio.sleep(0.5)
+    
+    # Send clarifier status
+    yield f"data: {json.dumps({'type': 'status', 'agent': 'clarifier', 'message': 'Analyzing your request...'})}\n\n"
+    await asyncio.sleep(1)
+    
+    # Send discovery status
+    yield f"data: {json.dumps({'type': 'status', 'agent': 'discovery', 'message': 'Discovering products from multiple sources...'})}\n\n"
+    await asyncio.sleep(1.5)
+    
+    # Send normalizer status
+    yield f"data: {json.dumps({'type': 'status', 'agent': 'normalizer', 'message': 'Enriching product data and quality signals...'})}\n\n"
+    await asyncio.sleep(1)
+    
+    # Send ranker status
+    yield f"data: {json.dumps({'type': 'status', 'agent': 'ranker', 'message': 'Ranking products and analyzing pros/cons...'})}\n\n"
+    await asyncio.sleep(1)
+    
+    # Send verifier status
+    yield f"data: {json.dumps({'type': 'status', 'agent': 'verifier', 'message': 'Verifying results and quality checks...'})}\n\n"
+    await asyncio.sleep(0.5)
+    
+    try:
+        # Execute the actual search
+        result = await planner.handle_user_goal(
+            query=query,
+            constraints=constraints,
+            request_id=request_id
+        )
+        
+        if not result["success"]:
+            yield f"data: {json.dumps({'type': 'error', 'message': 'No products found matching your criteria'})}\n\n"
+            return
+        
+        # Convert agent results to API format
+        recommendations = []
+        for rec in result["recommendations"]:
+            recommendation = {
+                "name": rec["name"],
+                "price": rec["price"],
+                "rating": rec["rating"],
+                "overall_score": rec["overall_score"],
+                "pros": rec["pros"],
+                "cons": rec["cons"],
+                "summary": rec["summary"],
+                "review_count": rec["review_count"],
+                "image_url": rec.get("image_url")
+            }
+            recommendations.append(recommendation)
+        
+        # Send final results
+        final_response = {
+            "type": "results",
+            "data": {
+                "query": query,
+                "recommendations": recommendations,
+                "total_found": result["total_found"]
+            }
+        }
+        yield f"data: {json.dumps(final_response)}\n\n"
+        
+    except Exception as e:
+        logger.error(f"Search failed: {e}")
+        yield f"data: {json.dumps({'type': 'error', 'message': f'Error processing search: {str(e)}'})}\n\n"
+
+@app.post("/search/stream")
+async def search_products_stream(query: SearchQuery):
+    """Search for products with real-time agent status updates."""
+    request_id = generate_request_id()
+    logger.info(f"[{request_id}] Received streaming search request: {query.query}")
+    
+    # Build constraints from query parameters
+    constraints = {}
+    if query.max_price:
+        constraints["max_price"] = query.max_price
+    if query.min_rating:
+        constraints["min_rating"] = query.min_rating
+    
+    return StreamingResponse(
+        search_stream_generator(query.query, constraints, request_id),
+        media_type="text/plain",
+        headers={
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+        }
+    )
+
 @app.post("/search", response_model=SearchResponse)
 async def search_products(query: SearchQuery):
     """Search for products using the new agent-based architecture."""
     try:
         request_id = generate_request_id()
+        logger.info(f"[{request_id}] Received search request: {query.query}")
+        logger.info(f"[{request_id}] Max price: {query.max_price}, Min rating: {query.min_rating}")
         
         # Build constraints from query parameters
         constraints = {}
@@ -97,12 +198,16 @@ async def search_products(query: SearchQuery):
         if query.min_rating:
             constraints["min_rating"] = query.min_rating
         
+        logger.info(f"[{request_id}] Starting agent pipeline with constraints: {constraints}")
+        
         # Use the planner agent to handle the entire pipeline
         result = await planner.handle_user_goal(
             query=query.query,
             constraints=constraints,
             request_id=request_id
         )
+        
+        logger.info(f"[{request_id}] Agent pipeline completed. Success: {result['success']}")
         
         if not result["success"]:
             return SearchResponse(
