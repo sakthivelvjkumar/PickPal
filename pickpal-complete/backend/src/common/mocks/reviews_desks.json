@@ -1,0 +1,139 @@
+{
+  "products": [
+    {
+      "name": "UPLIFT V2 Standing Desk",
+      "price": 599.99,
+      "stars": 4.7,
+      "urls": {
+        "amazon": "https://amazon.com/uplift-v2-standing-desk",
+        "uplift": "https://upliftdesk.com/v2-standing-desk"
+      },
+      "meta": {
+        "brand": "UPLIFT",
+        "model": "V2 Commercial",
+        "category": "standing_desk",
+        "release_year": 2023
+      },
+      "reviews": [
+        {"text": "Extremely sturdy, no wobbling even at full height. Assembly was straightforward.", "stars": 5, "date": "2024-01-15", "helpful": 42, "verified": true},
+        {"text": "The motor is quiet and smooth, height adjustment is effortless.", "stars": 5, "date": "2024-01-12", "helpful": 38, "verified": true},
+        {"text": "Great build quality, feels like it will last for years.", "stars": 5, "date": "2024-01-08", "helpful": 35, "verified": true},
+        {"text": "A bit pricey but worth it for the quality and warranty.", "stars": 4, "date": "2024-01-05", "helpful": 28, "verified": false},
+        {"text": "Perfect size for my home office, highly recommend.", "stars": 5, "date": "2024-01-02", "helpful": 31, "verified": true},
+        {"text": "Assembly instructions could be clearer, took longer than expected.", "stars": 4, "date": "2023-12-29", "helpful": 15, "verified": true},
+        {"text": "Desktop surface scratches easily, wish it was more durable.", "stars": 3, "date": "2023-12-26", "helpful": 12, "verified": true},
+        {"text": "Excellent customer service when I had delivery issues.", "stars": 5, "date": "2023-12-22", "helpful": 22, "verified": true},
+        {"text": "Memory settings work perfectly, saves my preferred heights.", "stars": 4, "date": "2023-12-19", "helpful": 19, "verified": false},
+        {"text": "Best investment for my productivity and health.", "stars": 5, "date": "2023-12-16", "helpful": 45, "verified": true}
+      ]
+    },
+    {
+      "name": "FlexiSpot E7 Standing Desk",
+      "price": 399.99,
+      "stars": 4.4,
+      "urls": {
+        "amazon": "https://amazon.com/flexispot-e7-standing-desk",
+        "flexispot": "https://flexispot.com/e7-standing-desk"
+      },
+      "meta": {
+        "brand": "FlexiSpot",
+        "model": "E7",
+        "category": "standing_desk",
+        "release_year": 2022
+      },
+      "reviews": [
+        {"text": "Good value for money, solid construction and smooth operation.", "stars": 4, "date": "2024-01-14", "helpful": 33, "verified": true},
+        {"text": "Easy to assemble, clear instructions and all parts included.", "stars": 4, "date": "2024-01-10", "helpful": 27, "verified": true},
+        {"text": "Height range is perfect for most people, very stable.", "stars": 4, "date": "2024-01-07", "helpful": 24, "verified": true},
+        {"text": "The desktop could be thicker, but overall satisfied with purchase.", "stars": 3, "date": "2024-01-04", "helpful": 18, "verified": false},
+        {"text": "Great customer service when I had questions about setup.", "stars": 4, "date": "2024-01-01", "helpful": 21, "verified": true},
+        {"text": "Motor is a bit noisy compared to premium models.", "stars": 3, "date": "2023-12-28", "helpful": 14, "verified": true},
+        {"text": "Excellent stability, no shaking when typing vigorously.", "stars": 5, "date": "2023-12-25", "helpful": 29, "verified": true},
+        {"text": "Cable management could be better designed.", "stars": 3, "date": "2023-12-21", "helpful": 11, "verified": false},
+        {"text": "Perfect for my budget, does everything I need.", "stars": 4, "date": "2023-12-18", "helpful": 25, "verified": true},
+        {"text": "Fast shipping and well-packaged, no damage.", "stars": 4, "date": "2023-12-15", "helpful": 16, "verified": true}
+      ]
+    },
+    {
+      "name": "IKEA Bekant Sit/Stand Desk",
+      "price": 249.99,
+      "stars": 4.1,
+      "urls": {
+        "amazon": "https://amazon.com/ikea-bekant-sitstand",
+        "ikea": "https://ikea.com/bekant-desk"
+      },
+      "meta": {
+        "brand": "IKEA",
+        "model": "Bekant",
+        "category": "standing_desk",
+        "release_year": 2021
+      },
+      "reviews": [
+        {"text": "Budget-friendly option that gets the job done. Not the sturdiest but adequate.", "stars": 3, "date": "2024-01-13", "helpful": 26, "verified": true},
+        {"text": "Simple design, fits well in small spaces.", "stars": 4, "date": "2024-01-09", "helpful": 19, "verified": true},
+        {"text": "Manual adjustment takes some effort, but it's reliable.", "stars": 3, "date": "2024-01-06", "helpful": 15, "verified": false},
+        {"text": "Good starter standing desk, perfect for trying out the concept.", "stars": 4, "date": "2024-01-03", "helpful": 22, "verified": true},
+        {"text": "Assembly instructions could be clearer, but manageable.", "stars": 3, "date": "2023-12-31", "helpful": 13, "verified": true},
+        {"text": "Desktop surface is prone to water damage, use coasters.", "stars": 2, "date": "2023-12-27", "helpful": 8, "verified": true},
+        {"text": "Great value, can't beat the price for what you get.", "stars": 4, "date": "2023-12-24", "helpful": 31, "verified": true},
+        {"text": "Wobbles a bit at standing height, not ideal for heavy use.", "stars": 2, "date": "2023-12-20", "helpful": 17, "verified": false},
+        {"text": "Perfect for my apartment, compact and functional.", "stars": 4, "date": "2023-12-17", "helpful": 20, "verified": true},
+        {"text": "Manual crank gets stiff over time, needs maintenance.", "stars": 3, "date": "2023-12-14", "helpful": 12, "verified": true}
+      ]
+    },
+    {
+      "name": "Jarvis Bamboo Standing Desk",
+      "price": 449.99,
+      "stars": 4.5,
+      "urls": {
+        "amazon": "https://amazon.com/jarvis-bamboo-standing-desk",
+        "fully": "https://fully.com/jarvis-bamboo-desk"
+      },
+      "meta": {
+        "brand": "Fully",
+        "model": "Jarvis Bamboo",
+        "category": "standing_desk",
+        "release_year": 2023
+      },
+      "reviews": [
+        {"text": "Beautiful bamboo surface, eco-friendly and sustainable choice.", "stars": 5, "date": "2024-01-11", "helpful": 39, "verified": true},
+        {"text": "Smooth and quiet operation, premium feel at reasonable price.", "stars": 4, "date": "2024-01-08", "helpful": 32, "verified": true},
+        {"text": "Excellent build quality, very stable at all heights.", "stars": 5, "date": "2024-01-05", "helpful": 28, "verified": true},
+        {"text": "Bamboo surface requires more maintenance than expected.", "stars": 3, "date": "2024-01-02", "helpful": 14, "verified": false},
+        {"text": "Perfect height range, accommodates both sitting and standing well.", "stars": 4, "date": "2023-12-30", "helpful": 25, "verified": true},
+        {"text": "Assembly was straightforward, good quality hardware included.", "stars": 4, "date": "2023-12-26", "helpful": 21, "verified": true},
+        {"text": "Bamboo shows water marks easily, need to be careful with drinks.", "stars": 3, "date": "2023-12-23", "helpful": 16, "verified": true},
+        {"text": "Great customer support, quick response to my questions.", "stars": 5, "date": "2023-12-19", "helpful": 23, "verified": true},
+        {"text": "Motor is whisper quiet, doesn't disturb others in office.", "stars": 5, "date": "2023-12-16", "helpful": 34, "verified": false},
+        {"text": "Sustainable materials make me feel good about the purchase.", "stars": 4, "date": "2023-12-13", "helpful": 18, "verified": true}
+      ]
+    },
+    {
+      "name": "Autonomous SmartDesk Pro",
+      "price": 349.99,
+      "stars": 4.2,
+      "urls": {
+        "amazon": "https://amazon.com/autonomous-smartdesk-pro",
+        "autonomous": "https://autonomous.ai/smartdesk-pro"
+      },
+      "meta": {
+        "brand": "Autonomous",
+        "model": "SmartDesk Pro",
+        "category": "standing_desk",
+        "release_year": 2022
+      },
+      "reviews": [
+        {"text": "Good balance of features and price, solid everyday desk.", "stars": 4, "date": "2024-01-12", "helpful": 27, "verified": true},
+        {"text": "App integration is nice, can set reminders to stand.", "stars": 4, "date": "2024-01-09", "helpful": 22, "verified": true},
+        {"text": "Assembly took longer than expected, instructions unclear.", "stars": 3, "date": "2024-01-06", "helpful": 15, "verified": false},
+        {"text": "Decent build quality for the price point.", "stars": 3, "date": "2024-01-03", "helpful": 18, "verified": true},
+        {"text": "Motor occasionally makes grinding noise, concerning.", "stars": 2, "date": "2023-12-31", "helpful": 12, "verified": true},
+        {"text": "Great value, does what it promises without breaking bank.", "stars": 4, "date": "2023-12-28", "helpful": 29, "verified": true},
+        {"text": "Desktop surface is fingerprint magnet, shows every smudge.", "stars": 3, "date": "2023-12-24", "helpful": 11, "verified": true},
+        {"text": "Customer service is hit or miss, long response times.", "stars": 2, "date": "2023-12-21", "helpful": 9, "verified": false},
+        {"text": "Stable and functional, meets my basic standing desk needs.", "stars": 4, "date": "2023-12-18", "helpful": 24, "verified": true},
+        {"text": "Smart features are gimmicky, basic desk functionality is solid.", "stars": 3, "date": "2023-12-15", "helpful": 13, "verified": true}
+      ]
+    }
+  ]
+}

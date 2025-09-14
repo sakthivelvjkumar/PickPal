@@ -1,0 +1,139 @@
+{
+  "products": [
+    {
+      "name": "Sony WF-1000XM4",
+      "price": 149.99,
+      "stars": 4.4,
+      "urls": {
+        "amazon": "https://amazon.com/sony-wf1000xm4",
+        "bestbuy": "https://bestbuy.com/sony-wf1000xm4"
+      },
+      "meta": {
+        "brand": "Sony",
+        "model": "WF-1000XM4",
+        "category": "wireless_earbuds",
+        "release_year": 2021
+      },
+      "reviews": [
+        {"text": "Amazing noise cancellation, best I've ever used. Battery life is excellent too.", "stars": 5, "date": "2024-01-15", "helpful": 23, "verified": true},
+        {"text": "Sound quality is incredible, very comfortable to wear for hours.", "stars": 5, "date": "2024-01-10", "helpful": 18, "verified": true},
+        {"text": "The case is a bit bulky but the earbuds themselves are perfect.", "stars": 4, "date": "2024-01-08", "helpful": 12, "verified": true},
+        {"text": "Sometimes connectivity issues with my phone, but overall great product.", "stars": 4, "date": "2024-01-05", "helpful": 8, "verified": false},
+        {"text": "Worth every penny, the ANC is game-changing for commuting.", "stars": 5, "date": "2024-01-03", "helpful": 31, "verified": true},
+        {"text": "Battery drains faster than advertised, disappointing.", "stars": 3, "date": "2023-12-28", "helpful": 15, "verified": true},
+        {"text": "Perfect for running, stays in place and sweat resistant.", "stars": 5, "date": "2023-12-25", "helpful": 22, "verified": true},
+        {"text": "The touch controls are too sensitive, accidental pauses constantly.", "stars": 3, "date": "2023-12-20", "helpful": 9, "verified": false},
+        {"text": "Great for calls, microphone quality is crystal clear.", "stars": 4, "date": "2023-12-18", "helpful": 14, "verified": true},
+        {"text": "Sound leakage at high volumes, not great for quiet environments.", "stars": 3, "date": "2023-12-15", "helpful": 7, "verified": true}
+      ]
+    },
+    {
+      "name": "Apple AirPods Pro 2",
+      "price": 179.99,
+      "stars": 4.6,
+      "urls": {
+        "amazon": "https://amazon.com/airpods-pro-2",
+        "apple": "https://apple.com/airpods-pro"
+      },
+      "meta": {
+        "brand": "Apple",
+        "model": "AirPods Pro 2nd Gen",
+        "category": "wireless_earbuds",
+        "release_year": 2022
+      },
+      "reviews": [
+        {"text": "Perfect integration with iPhone, seamless switching between devices.", "stars": 5, "date": "2024-01-12", "helpful": 45, "verified": true},
+        {"text": "The spatial audio feature is mind-blowing for movies and music.", "stars": 5, "date": "2024-01-09", "helpful": 38, "verified": true},
+        {"text": "A bit expensive but the build quality justifies the price.", "stars": 4, "date": "2024-01-07", "helpful": 21, "verified": true},
+        {"text": "Battery life could be better, but the quick charge feature helps.", "stars": 4, "date": "2024-01-04", "helpful": 16, "verified": false},
+        {"text": "Best earbuds for iOS users, no competition.", "stars": 5, "date": "2024-01-02", "helpful": 52, "verified": true},
+        {"text": "Overpriced for what you get, there are better alternatives.", "stars": 2, "date": "2023-12-30", "helpful": 11, "verified": true},
+        {"text": "The fit is perfect, never falls out during workouts.", "stars": 5, "date": "2023-12-27", "helpful": 29, "verified": true},
+        {"text": "Poor compatibility with Android devices, many features missing.", "stars": 2, "date": "2023-12-22", "helpful": 18, "verified": false},
+        {"text": "Excellent noise cancellation, rivals over-ear headphones.", "stars": 5, "date": "2023-12-19", "helpful": 33, "verified": true},
+        {"text": "Case gets scratched easily, wish it was more durable.", "stars": 3, "date": "2023-12-16", "helpful": 8, "verified": true}
+      ]
+    },
+    {
+      "name": "Bose QuietComfort Earbuds",
+      "price": 199.99,
+      "stars": 4.3,
+      "urls": {
+        "amazon": "https://amazon.com/bose-quietcomfort-earbuds",
+        "bose": "https://bose.com/quietcomfort-earbuds"
+      },
+      "meta": {
+        "brand": "Bose",
+        "model": "QuietComfort Earbuds",
+        "category": "wireless_earbuds",
+        "release_year": 2020
+      },
+      "reviews": [
+        {"text": "Unmatched noise cancellation, perfect for flights and busy environments.", "stars": 5, "date": "2024-01-11", "helpful": 41, "verified": true},
+        {"text": "Comfortable fit, stays in ears during workouts.", "stars": 4, "date": "2024-01-06", "helpful": 19, "verified": true},
+        {"text": "Sound quality is good but not as crisp as some competitors.", "stars": 3, "date": "2024-01-01", "helpful": 13, "verified": false},
+        {"text": "The app could be more intuitive, but the earbuds are solid.", "stars": 4, "date": "2023-12-29", "helpful": 10, "verified": true},
+        {"text": "Great for calls, microphone quality is excellent.", "stars": 4, "date": "2023-12-26", "helpful": 24, "verified": true},
+        {"text": "Battery life is disappointing, doesn't last a full day.", "stars": 3, "date": "2023-12-23", "helpful": 17, "verified": true},
+        {"text": "Too bulky, doesn't fit well in smaller ears.", "stars": 2, "date": "2023-12-21", "helpful": 12, "verified": false},
+        {"text": "Premium build quality, feels like it will last years.", "stars": 5, "date": "2023-12-17", "helpful": 26, "verified": true},
+        {"text": "Connection drops frequently, very frustrating.", "stars": 2, "date": "2023-12-14", "helpful": 15, "verified": true},
+        {"text": "Best noise cancellation I've experienced, worth the price.", "stars": 5, "date": "2023-12-12", "helpful": 35, "verified": true}
+      ]
+    },
+    {
+      "name": "Sennheiser Momentum True Wireless 3",
+      "price": 129.99,
+      "stars": 4.2,
+      "urls": {
+        "amazon": "https://amazon.com/sennheiser-momentum-tw3",
+        "sennheiser": "https://sennheiser.com/momentum-tw3"
+      },
+      "meta": {
+        "brand": "Sennheiser",
+        "model": "Momentum True Wireless 3",
+        "category": "wireless_earbuds",
+        "release_year": 2022
+      },
+      "reviews": [
+        {"text": "Audiophile-grade sound quality, incredible detail and clarity.", "stars": 5, "date": "2024-01-13", "helpful": 28, "verified": true},
+        {"text": "Comfortable for long listening sessions, great build quality.", "stars": 4, "date": "2024-01-08", "helpful": 15, "verified": true},
+        {"text": "No active noise cancellation is a dealbreaker for me.", "stars": 3, "date": "2024-01-03", "helpful": 11, "verified": false},
+        {"text": "Battery life is excellent, case provides multiple charges.", "stars": 4, "date": "2023-12-31", "helpful": 20, "verified": true},
+        {"text": "Best sound quality in this price range, highly recommend.", "stars": 5, "date": "2023-12-28", "helpful": 32, "verified": true},
+        {"text": "Touch controls are finicky, often don't respond properly.", "stars": 3, "date": "2023-12-24", "helpful": 9, "verified": true},
+        {"text": "Perfect for music lovers, bass is punchy without being overwhelming.", "stars": 5, "date": "2023-12-20", "helpful": 25, "verified": true},
+        {"text": "Expensive for what you get, better options available.", "stars": 2, "date": "2023-12-18", "helpful": 6, "verified": false},
+        {"text": "Great for calls, voice clarity is impressive.", "stars": 4, "date": "2023-12-15", "helpful": 13, "verified": true},
+        {"text": "Fit is hit or miss, depends on your ear shape.", "stars": 3, "date": "2023-12-13", "helpful": 8, "verified": true}
+      ]
+    },
+    {
+      "name": "Jabra Elite 85t",
+      "price": 99.99,
+      "stars": 4.1,
+      "urls": {
+        "amazon": "https://amazon.com/jabra-elite-85t",
+        "jabra": "https://jabra.com/elite-85t"
+      },
+      "meta": {
+        "brand": "Jabra",
+        "model": "Elite 85t",
+        "category": "wireless_earbuds",
+        "release_year": 2020
+      },
+      "reviews": [
+        {"text": "Great value for money, solid performance across all areas.", "stars": 4, "date": "2024-01-14", "helpful": 22, "verified": true},
+        {"text": "Excellent for calls and meetings, microphone is top-notch.", "stars": 5, "date": "2024-01-09", "helpful": 31, "verified": true},
+        {"text": "Comfortable fit, good for extended wear.", "stars": 4, "date": "2024-01-05", "helpful": 16, "verified": false},
+        {"text": "Sound quality is decent but not exceptional.", "stars": 3, "date": "2024-01-02", "helpful": 12, "verified": true},
+        {"text": "Battery life is impressive, lasts all day with case.", "stars": 4, "date": "2023-12-30", "helpful": 19, "verified": true},
+        {"text": "App is buggy, firmware updates often cause issues.", "stars": 2, "date": "2023-12-26", "helpful": 14, "verified": true},
+        {"text": "Good noise cancellation for the price point.", "stars": 4, "date": "2023-12-23", "helpful": 17, "verified": true},
+        {"text": "Build quality feels cheap, plastic construction.", "stars": 3, "date": "2023-12-19", "helpful": 7, "verified": false},
+        {"text": "Perfect for business use, professional look and feel.", "stars": 4, "date": "2023-12-16", "helpful": 21, "verified": true},
+        {"text": "Connection is stable, no dropouts during use.", "stars": 4, "date": "2023-12-14", "helpful": 18, "verified": true}
+      ]
+    }
+  ]
+}
