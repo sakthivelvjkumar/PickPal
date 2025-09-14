@@ -23,6 +23,12 @@ class Settings(BaseSettings):
     # Response Configuration
     RESPONSE_TIMEOUT: float = 3.0
     TOP_RECOMMENDATIONS: int = 3
+
+    # Claude API Configuration
+    CLAUDE_API_KEY: str = "your_claude_api_key_here"
+    CLAUDE_MODEL: str = "claude-3-sonnet-20240229"
+    CLAUDE_MAX_TOKENS: int = 1000
+    CLAUDE_TEMPERATURE: float = 0.3
     
     class Config:
         env_file = ".env"

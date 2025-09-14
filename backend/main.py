@@ -3,6 +3,40 @@ import time
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 import logging
+from typing import Dict, Any, List
+from pydantic import BaseModel
+from services.claude_service import claude_service
+class RefineRequest(BaseModel):
+    original_query: str
+    current_results: List[Dict[str, Any]]
+    user_feedback: str
+
+@app.post("/refine")
+async def refine_search(request: RefineRequest):
+    """Handle conversational refinement using Claude"""
+    try:
+        refinement = await claude_service.handle_conversational_refinement(
+            request.original_query,
+            request.current_results,
+            request.user_feedback
+        )
+        if refinement.get('new_search_needed'):
+            # Trigger new search with refined query
+            new_result = await orchestrator.execute_search(
+                refinement.get('suggested_query', request.original_query)
+            )
+            return {
+                "status": "refined",
+                "explanation": refinement.get('explanation'),
+                "new_results": new_result
+            }
+        return {
+            "status": "understood", 
+            "explanation": refinement.get('explanation'),
+            "refinement": refinement
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 from agents.base_agent import EventBus
 from models.schemas import SearchRequest, SearchResponse
