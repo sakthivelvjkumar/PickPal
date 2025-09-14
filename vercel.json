@@ -1,0 +1,14 @@
+{
+  "version": 2,
+  "name": "mypickpal-frontend",
+  "buildCommand": "cd pickpal-complete/frontend && npm install && npm run build",
+  "outputDirectory": "pickpal-complete/frontend/dist",
+  "installCommand": "cd pickpal-complete/frontend && npm install",
+  "devCommand": "cd pickpal-complete/frontend && npm run dev",
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}
