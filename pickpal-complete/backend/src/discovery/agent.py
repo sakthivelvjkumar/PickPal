@@ -56,28 +56,45 @@ class DiscoveryAgent(AgentBase):
         }
     
     def _load_mock_data(self) -> dict:
-        """Load mock product data from JSON files."""
+        """Load mock product data from text files."""
         mock_data = {}
         
-        # Load earbuds data
-        earbuds_path = os.path.join(os.path.dirname(__file__), "..", "common", "mocks", "reviews_earbuds.json")
-        try:
-            with open(earbuds_path, 'r') as f:
-                earbuds_data = json.load(f)
-                mock_data["wireless_earbuds"] = earbuds_data["products"]
-        except FileNotFoundError:
-            logger.warning(f"Mock data file not found: {earbuds_path}")
-            mock_data["wireless_earbuds"] = []
+        # Define category mappings
+        categories = {
+            "wireless_earbuds": "wireless_earbuds.txt",
+            "standing_desk": "standing_desk.txt", 
+            "gaming_laptop": "gaming_laptop.txt",
+            "noise_canceling_headphones": "noise_canceling_headphones.txt"
+        }
         
-        # Load desk data
-        desks_path = os.path.join(os.path.dirname(__file__), "..", "common", "mocks", "reviews_desks.json")
-        try:
-            with open(desks_path, 'r') as f:
-                desks_data = json.load(f)
-                mock_data["standing_desk"] = desks_data["products"]
-        except FileNotFoundError:
-            logger.warning(f"Mock data file not found: {desks_path}")
-            mock_data["standing_desk"] = []
+        for category, filename in categories.items():
+            file_path = os.path.join(os.path.dirname(__file__), "..", "common", "data", filename)
+            try:
+                with open(file_path, 'r') as f:
+                    products = []
+                    for line in f:
+                        line = line.strip()
+                        if line:
+                            parts = line.split('|')
+                            if len(parts) >= 6:
+                                name, price, rating, pros, cons, image_url = parts
+                                product = {
+                                    "product": name,
+                                    "name": name,
+                                    "price": float(price),
+                                    "stars": float(rating),
+                                    "reviews": [
+                                        {"text": pro, "sentiment": "positive"} for pro in pros.split(',')
+                                    ] + [
+                                        {"text": con, "sentiment": "negative"} for con in cons.split(',')
+                                    ],
+                                    "image_url": image_url
+                                }
+                                products.append(product)
+                    mock_data[category] = products
+            except FileNotFoundError:
+                logger.warning(f"Mock data file not found: {file_path}")
+                mock_data[category] = []
         
         return mock_data
     
@@ -178,19 +195,31 @@ class DiscoveryAgent(AgentBase):
             return await self._fallback_to_mock_data(brief, category, trace)
     
     def _detect_category(self, query: str, category: str) -> str:
-        # Detect product category
-        detected_category = detect_product_category(query, category)
-        if not detected_category or detected_category == "general":
-            # Try to infer from query keywords
-            query_lower = query.lower()
-            if any(word in query_lower for word in ["earbuds", "headphones", "airpods"]):
-                detected_category = "wireless_earbuds"
-            elif any(word in query_lower for word in ["desk", "standing", "workstation"]):
-                detected_category = "standing_desk"
-            else:
-                detected_category = "wireless_earbuds"  # Default fallback
+        # Detect product category based on query matching the 4 predefined options
+        query_lower = query.lower()
         
-        return detected_category
+        # Match against the 4 specific frontend options
+        if "wireless earbuds" in query_lower and "under" in query_lower and "200" in query_lower:
+            return "wireless_earbuds"
+        elif "standing desk" in query_lower and "small spaces" in query_lower:
+            return "standing_desk"
+        elif "gaming laptop" in query_lower and "battery life" in query_lower:
+            return "gaming_laptop"
+        elif "noise" in query_lower and "canceling" in query_lower and "headphones" in query_lower and "travel" in query_lower:
+            return "noise_canceling_headphones"
+        
+        # Fallback detection for partial matches
+        if any(word in query_lower for word in ["earbuds", "airpods", "wireless earbuds"]):
+            return "wireless_earbuds"
+        elif any(word in query_lower for word in ["desk", "standing", "workstation"]):
+            return "standing_desk"
+        elif any(word in query_lower for word in ["laptop", "gaming", "computer"]):
+            return "gaming_laptop"
+        elif any(word in query_lower for word in ["headphones", "noise", "canceling", "cancelling"]):
+            return "noise_canceling_headphones"
+        
+        # Default fallback to wireless earbuds for any other query
+        return "wireless_earbuds"
     
     def _build_search_queries(self, brief: ShoppingBrief, category: str) -> List[str]:
         """Build search queries with synonyms and constraints."""
